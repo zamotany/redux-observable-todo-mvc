@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import TodoItem from './TodoItem';
 import Footer from './Footer';
-import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../constants/TodoFilters';
+import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../modules/visibilityFilter/actions';
 
-const TODO_FILTERS = {
+const filters = {
   [SHOW_ALL]: () => true,
   [SHOW_ACTIVE]: todo => !todo.completed,
   [SHOW_COMPLETED]: todo => todo.completed,
@@ -12,49 +12,48 @@ const TODO_FILTERS = {
 export default class MainSection extends Component {
   static propTypes = {
     // eslint-disable-next-line react/forbid-prop-types
-    todos: PropTypes.array.isRequired,
-    // eslint-disable-next-line react/forbid-prop-types
-    actions: PropTypes.object.isRequired,
+    todos: PropTypes.object.isRequired,
+    filter: PropTypes.string.isRequired,
+    removeCompleted: PropTypes.func.isRequired,
+    filterTodos: PropTypes.func.isRequired,
+    editTodo: PropTypes.func.isRequired,
+    deleteTodo: PropTypes.func.isRequired,
+    completeTodo: PropTypes.func.isRequired,
   }
 
-  state = { filter: SHOW_ALL }
-
-  handleClearCompleted = () => {
-    this.props.actions.clearCompleted();
+  _removeCompletedHandler = () => {
+    this.props.removeCompleted();
   }
 
-  handleShow = (filter) => {
-    this.setState({ filter });
+  _handleShow = (filter) => {
+    this.props.filterTodos(filter);
   }
 
-  renderToggleAll(completedCount) {
-    const { todos, actions } = this.props;
-    if (todos.length > 0) {
+  _renderToggleAll(completedCount) {
+    const { todos } = this.props;
+    if (todos.data.length) {
       return (
         <input
           className="toggle-all"
           type="checkbox"
-          checked={completedCount === todos.length}
-          onChange={actions.completeAll}
+          checked={completedCount === todos.data.length}
         />
       );
     }
     return null;
   }
 
-  renderFooter(completedCount) {
-    const { todos } = this.props;
-    const { filter } = this.state;
-    const activeCount = todos.length - completedCount;
-
-    if (todos.length) {
+  _renderFooter(completedCount) {
+    const { todos, filter } = this.props;
+    const activeCount = todos.data.length - completedCount;
+    if (todos.data.length) {
       return (
         <Footer
           completedCount={completedCount}
           activeCount={activeCount}
           filter={filter}
-          onClearCompleted={this.handleClearCompleted}
-          onShow={this.handleShow}
+          onClearCompleted={this._removeCompletedHandler}
+          filterTodos={this._handleShow}
         />
       );
     }
@@ -62,22 +61,27 @@ export default class MainSection extends Component {
   }
 
   render() {
-    const { todos, actions } = this.props;
-    const { filter } = this.state;
+    const { todos, filter } = this.props;
 
-    const filteredTodos = todos.filter(TODO_FILTERS[filter]);
+    const filteredTodos = todos.data.filter(filters[filter]);
     // eslint-disable-next-line no-confusing-arrow
-    const completedCount = todos.reduce((count, todo) => todo.completed ? count + 1 : count, 0);
+    const completedCount = todos.data.filter(filters[SHOW_COMPLETED]).length;
 
-    return (
+    return todos.pending ? null : (
       <section className="main">
-        {this.renderToggleAll(completedCount)}
+        {this._renderToggleAll(completedCount)}
         <ul className="todo-list">
-          {filteredTodos.map(todo =>
-            <TodoItem key={todo.id} todo={todo} {...actions} />,
-          )}
+          {filteredTodos.map(todo => (
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              editTodo={this.props.editTodo}
+              deleteTodo={this.props.deleteTodo}
+              completeTodo={this.props.completeTodo}
+            />
+          ))}
         </ul>
-        {this.renderFooter(completedCount)}
+        {this._renderFooter(completedCount)}
       </section>
     );
   }

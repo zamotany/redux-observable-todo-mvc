@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import classnames from 'classnames';
-import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../constants/TodoFilters';
+import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../modules/visibilityFilter/actions';
 
 const FILTER_TITLES = {
   [SHOW_ALL]: 'All',
@@ -14,10 +14,10 @@ export default class Footer extends Component {
     activeCount: PropTypes.number.isRequired,
     filter: PropTypes.string.isRequired,
     onClearCompleted: PropTypes.func.isRequired,
-    onShow: PropTypes.func.isRequired,
+    filterTodos: PropTypes.func.isRequired,
   }
 
-  renderTodoCount() {
+  _renderTodoCount() {
     const { activeCount } = this.props;
     const itemWord = activeCount === 1 ? 'item' : 'items';
 
@@ -28,23 +28,23 @@ export default class Footer extends Component {
     );
   }
 
-  renderFilterLink(filter) {
+  _renderFilterLink(filter) {
     const title = FILTER_TITLES[filter];
-    const { filter: selectedFilter, onShow } = this.props;
+    const { filter: selectedFilter, filterTodos } = this.props;
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <a
         className={classnames({ selected: filter === selectedFilter })}
         style={{ cursor: 'pointer' }}
-        onClick={() => onShow(filter)}
+        onClick={() => filterTodos(filter)}
       >
         {title}
       </a>
     );
   }
 
-  renderClearButton() {
+  _renderClearButton() {
     const { completedCount, onClearCompleted } = this.props;
     if (completedCount > 0) {
       return (
@@ -62,15 +62,15 @@ export default class Footer extends Component {
   render() {
     return (
       <footer className="footer">
-        {this.renderTodoCount()}
+        {this._renderTodoCount()}
         <ul className="filters">
           {[SHOW_ALL, SHOW_ACTIVE, SHOW_COMPLETED].map(filter =>
             <li key={filter}>
-              {this.renderFilterLink(filter)}
+              {this._renderFilterLink(filter)}
             </li>,
           )}
         </ul>
-        {this.renderClearButton()}
+        {this._renderClearButton()}
       </footer>
     );
   }

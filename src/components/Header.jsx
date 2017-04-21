@@ -4,6 +4,7 @@ import TodoTextInput from './TodoTextInput';
 export default class Header extends Component {
   static propTypes = {
     addTodo: PropTypes.func.isRequired,
+    loading: PropTypes.bool.isRequired,
   }
 
   handleSave = (text) => {
@@ -15,12 +16,17 @@ export default class Header extends Component {
   render() {
     return (
       <header className="header">
-        <h1>todos</h1>
-        <TodoTextInput
-          newTodo
-          onSave={this.handleSave}
-          placeholder="What needs to be done?"
-        />
+        <h1>Todos</h1>
+        {this.props.loading
+          ? <h2>Loading todos...</h2>
+          : (
+            <TodoTextInput
+              newTodo
+              onSave={this.handleSave}
+              placeholder="What needs to be done?"
+            />
+          )
+        }
       </header>
     );
   }

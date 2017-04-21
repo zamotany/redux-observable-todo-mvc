@@ -1,4 +1,10 @@
 {
+  "env": {
+    "browser": true
+  },
   "parser": "babel-eslint",
-  "extends": "airbnb"
+  "extends": "airbnb",
+  "rules": {
+    "no-underscore-dangle": ["error", { "allowAfterThis": true }]
+  }
 }
