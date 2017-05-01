@@ -1,14 +1,18 @@
-// Action for initial todos fetching
-export const TODOS_FETCH_REQUEST = 'TODOS_FETCH_REUEST';
-export const TODOS_FETCH_SUCCESS = 'TODOS_FETCH_SUCCESS';
-export const TODOS_FETCH_FAILURE = 'TODOS_FETCH_FAILURE';
-
-export const TODOS_ADD = 'TODOS_ADD';
-export const TODOS_REMOVE = 'TODOS_REMOVE';
-export const TODOS_EDIT = 'TODOS_EDIT';
-export const TODOS_COMPLETE = 'TODOS_COMPLETE';
-export const TODOS_COMPLETE_ALL = 'TODOS_COMPLETE_ALL';
-export const TODOS_REMOVE_COMPLETED = 'TODOS_REMOVE_COMPLETED';
+import {
+  TODOS_AJAX_FAILURE,
+  TODOS_FETCH_REQUEST,
+  TODOS_FETCH_SUCCESS,
+  TODOS_ADD_REQUEST,
+  TODOS_ADD_SUCCESS,
+  TODOS_REMOVE_REQUEST,
+  TODOS_REMOVE_SUCCESS,
+  TODOS_COMPLETE_REQUEST,
+  TODOS_COMPLETE_SUCCESS,
+  TODOS_EDIT_REQUEST,
+  TODOS_EDIT_SUCCESS,
+  TODOS_REMOVE_COMPLETED_REQUEST,
+  TODOS_REMOVE_COMPLETED_SUCCESS,
+} from './actions';
 
 const initialState = {
   pending: false,
@@ -18,9 +22,21 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case TODOS_FETCH_REQUEST:
+    case TODOS_AJAX_FAILURE:
       return {
         ...state,
+        pending: false,
+        error: action.error,
+      };
+    case TODOS_FETCH_REQUEST:
+    case TODOS_ADD_REQUEST:
+    case TODOS_REMOVE_REQUEST:
+    case TODOS_COMPLETE_REQUEST:
+    case TODOS_REMOVE_COMPLETED_REQUEST:
+    case TODOS_EDIT_REQUEST:
+      return {
+        ...state,
+        error: null,
         pending: true,
       };
     case TODOS_FETCH_SUCCESS:
@@ -29,40 +45,26 @@ export default (state = initialState, action) => {
         pending: false,
         data: action.payload,
       };
-    case TODOS_FETCH_FAILURE:
+    case TODOS_ADD_SUCCESS:
       return {
         ...state,
         pending: false,
-        error: action.error,
-      };
-    case TODOS_ADD:
-      return {
-        ...state,
         data: [
+          ...state.data,
           {
-            id: state.data.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1,
+            id: action.id,
             completed: false,
             text: action.text,
           },
-          ...state.data,
         ],
       };
-    case TODOS_REMOVE:
+    case TODOS_REMOVE_SUCCESS:
       return {
         ...state,
+        pending: false,
         data: state.data.filter(todo => todo.id !== action.id),
       };
-    case TODOS_EDIT:
-      return {
-        ...state,
-        data: state.data.map((todo) => {
-          if (todo.id === action.id) {
-            return { ...todo, text: action.text };
-          }
-          return todo;
-        }),
-      };
-    case TODOS_COMPLETE:
+    case TODOS_COMPLETE_SUCCESS:
       return {
         ...state,
         data: state.data.map((todo) => {
@@ -72,7 +74,17 @@ export default (state = initialState, action) => {
           return todo;
         }),
       };
-    case TODOS_REMOVE_COMPLETED:
+    case TODOS_EDIT_SUCCESS:
+      return {
+        ...state,
+        data: state.data.map((todo) => {
+          if (todo.id === action.id) {
+            return { ...todo, text: action.text };
+          }
+          return todo;
+        }),
+      };
+    case TODOS_REMOVE_COMPLETED_SUCCESS:
       return {
         ...state,
         data: state.data.filter(todo => !todo.completed),
@@ -82,10 +94,3 @@ export default (state = initialState, action) => {
   }
 };
 
-
-export const fetchTodos = () => ({ type: TODOS_FETCH_REQUEST });
-export const addTodo = text => ({ type: TODOS_ADD, text });
-export const deleteTodo = id => ({ type: TODOS_REMOVE, id });
-export const editTodo = (id, text) => ({ type: TODOS_EDIT, id, text });
-export const completeTodo = id => ({ type: TODOS_COMPLETE, id });
-export const removeCompleted = () => ({ type: TODOS_REMOVE_COMPLETED });

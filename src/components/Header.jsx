@@ -1,10 +1,13 @@
-import React, { PropTypes, Component } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import TodoTextInput from './TodoTextInput';
+import ErrorMessage from './ErrorMessage';
 
 export default class Header extends Component {
   static propTypes = {
     addTodo: PropTypes.func.isRequired,
     loading: PropTypes.bool.isRequired,
+    error: PropTypes.string.isRequired,
   }
 
   handleSave = (text) => {
@@ -17,6 +20,7 @@ export default class Header extends Component {
     return (
       <header className="header">
         <h1>Todos</h1>
+        <ErrorMessage message={this.props.error} />
         {this.props.loading
           ? <h2>Loading todos...</h2>
           : (

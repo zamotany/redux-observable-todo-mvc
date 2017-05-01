@@ -1,11 +1,12 @@
 import { combineReducers } from 'redux';
 import { combineEpics } from 'redux-observable';
 import todosReducer from './todos/reducer';
-import { fetchTodos } from './todos/epics';
+import todosEpic from './todos/epics';
 import visibilityFilter from './visibilityFilter/reducer';
 
+
 export const epics = combineEpics(
-  fetchTodos,
+  todosEpic,
 );
 
 export const reducers = combineReducers({

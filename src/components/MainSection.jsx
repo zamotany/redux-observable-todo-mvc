@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import TodoItem from './TodoItem';
 import Footer from './Footer';
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../modules/visibilityFilter/actions';
@@ -67,7 +68,7 @@ export default class MainSection extends Component {
     // eslint-disable-next-line no-confusing-arrow
     const completedCount = todos.data.filter(filters[SHOW_COMPLETED]).length;
 
-    return todos.pending ? null : (
+    return todos.pending && !todos.data.length ? null : (
       <section className="main">
         {this._renderToggleAll(completedCount)}
         <ul className="todo-list">

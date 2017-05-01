@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import TodoTextInput from './TodoTextInput';
 
@@ -47,7 +48,7 @@ export default class TodoItem extends Component {
             className="toggle"
             type="checkbox"
             checked={todo.completed}
-            onChange={() => completeTodo(todo.id)}
+            onChange={() => completeTodo(todo.id, todo.completed)}
           />
           <label onDoubleClick={this.handleDoubleClick}>
             {todo.text}
