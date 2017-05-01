@@ -50,7 +50,7 @@ export default class TodoItem extends Component {
             checked={todo.completed}
             onChange={() => completeTodo(todo.id, todo.completed)}
           />
-          <label onDoubleClick={this.handleDoubleClick}>
+          <label htmlFor="itself" onDoubleClick={this.handleDoubleClick}>
             {todo.text}
           </label>
           <button
