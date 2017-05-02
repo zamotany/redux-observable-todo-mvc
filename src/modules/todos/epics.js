@@ -69,12 +69,11 @@ const completeTodo = action$ =>
 
 const removeCompletedTodos = (action$, { getState }) =>
   action$.ofType(TODOS_REMOVE_COMPLETED_REQUEST)
-    .mergeMap(() => Observable.merge(
+    .mergeMap(() => Observable.forkJoin(
         ...getState().todos.data.filter(todo => todo.completed).map(todo =>
           ajax.delete(`http://localhost:3001/todos/${todo.id}`),
         ),
       )
-      .takeLast(1)
       .map(() => ({ type: TODOS_REMOVE_COMPLETED_SUCCESS }))
       .catch(error => Observable.of({
         type: TODOS_AJAX_FAILURE,
