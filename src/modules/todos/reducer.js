@@ -26,7 +26,10 @@ export default (state = initialState, action) => {
       return {
         ...state,
         pending: false,
-        error: action.error,
+        error: {
+          message: action.message,
+          ajaxError: action.error,
+        },
       };
     case TODOS_FETCH_REQUEST:
     case TODOS_ADD_REQUEST:

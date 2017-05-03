@@ -18,15 +18,18 @@ import {
   TODOS_REMOVE_COMPLETED_SUCCESS,
 } from './actions';
 
+const createErrorAction = message => error => Observable.of({
+  type: TODOS_AJAX_FAILURE,
+  error,
+  message,
+});
+
 const fetchTodos = action$ =>
   action$.ofType(TODOS_FETCH_REQUEST)
     .mergeMap(() =>
       ajax.getJSON('http://localhost:3001/todos')
         .map(response => ({ type: TODOS_FETCH_SUCCESS, payload: response }))
-        .catch(error => Observable.of({
-          type: TODOS_AJAX_FAILURE,
-          error,
-        })),
+        .catch(createErrorAction('Failed to fetch tasks')),
     );
 
 const addTodo = action$ =>
@@ -37,10 +40,7 @@ const addTodo = action$ =>
         completed: false,
       }, { 'Content-Type': 'application/json' })
         .map(({ response }) => ({ type: TODOS_ADD_SUCCESS, id: response.id, text: action.text }))
-        .catch(error => Observable.of({
-          type: TODOS_AJAX_FAILURE,
-          error,
-        })),
+        .catch(createErrorAction('Failed to add a new task')),
     );
 
 const removeTodo = action$ =>
@@ -48,10 +48,7 @@ const removeTodo = action$ =>
     .mergeMap(action =>
       ajax.delete(`http://localhost:3001/todos/${action.id}`)
         .map(() => ({ type: TODOS_REMOVE_SUCCESS, id: action.id }))
-        .catch(error => Observable.of({
-          type: TODOS_AJAX_FAILURE,
-          error,
-        })),
+        .catch(createErrorAction(`Failed to remove task #${action.id}`)),
     );
 
 const completeTodo = action$ =>
@@ -61,10 +58,7 @@ const completeTodo = action$ =>
         completed: !action.completed,
       }, { 'Content-Type': 'application/json' })
         .map(() => ({ type: TODOS_COMPLETE_SUCCESS, id: action.id }))
-        .catch(error => Observable.of({
-          type: TODOS_AJAX_FAILURE,
-          error,
-        })),
+        .catch(createErrorAction(`Failed to mark task #${action.id} as completed`)),
     );
 
 const removeCompletedTodos = (action$, { getState }) =>
@@ -75,10 +69,7 @@ const removeCompletedTodos = (action$, { getState }) =>
         ),
       )
       .map(() => ({ type: TODOS_REMOVE_COMPLETED_SUCCESS }))
-      .catch(error => Observable.of({
-        type: TODOS_AJAX_FAILURE,
-        error,
-      })),
+      .catch(createErrorAction('Failed to remove all completed tasks')),
     );
 
 const editTodo = action$ =>
@@ -88,10 +79,7 @@ const editTodo = action$ =>
         text: action.text,
       }, { 'Content-Type': 'application/json' })
         .map(() => ({ type: TODOS_EDIT_SUCCESS, id: action.id, text: action.text }))
-        .catch(error => Observable.of({
-          type: TODOS_AJAX_FAILURE,
-          error,
-        })),
+        .catch(createErrorAction(`Failed to edit task #${action.id}`)),
     );
 
 export default combineEpics(
