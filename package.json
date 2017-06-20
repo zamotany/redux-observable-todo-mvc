@@ -1,5 +1,5 @@
 {
-  "name": "callstack-redux-onservale",
+  "name": "redux-observable-todo-mvc",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
